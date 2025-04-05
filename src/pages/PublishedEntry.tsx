@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Heart, MessageSquare } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { JournalEntry } from "@/types/journal";
 import { getPublishedEntry } from "@/lib/journal-service";
 import { format } from "date-fns";
@@ -71,6 +72,8 @@ const PublishedEntry = () => {
     );
   }
 
+  const userInitials = entry.userId.slice(0, 2).toUpperCase();
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -91,6 +94,19 @@ const PublishedEntry = () => {
             color: entry.style?.textColor || '#1A1F2C',
           }}
         >
+          <div className="flex items-center gap-3 mb-6">
+            <Avatar>
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium">{entry.userId}</p>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-1" />
+                {format(new Date(entry.date), "MMMM d, yyyy")}
+              </div>
+            </div>
+          </div>
+          
           <div className="mb-6">
             <h1 
               className="text-3xl md:text-4xl mb-4"
@@ -100,10 +116,6 @@ const PublishedEntry = () => {
             >
               {entry.title}
             </h1>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-3 w-3 mr-1" />
-              {format(new Date(entry.date), "MMMM d, yyyy")}
-            </div>
           </div>
           
           <div className="prose max-w-none">
@@ -118,12 +130,32 @@ const PublishedEntry = () => {
           </div>
           
           {entry.images.length > 0 && (
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-8 grid grid-cols-1 gap-4">
               {entry.images.map((img, i) => (
-                <div key={i} className="aspect-video bg-muted rounded-md"></div>
+                <div key={i} className="rounded-md overflow-hidden">
+                  <img 
+                    src={img} 
+                    alt={`Journal image ${i + 1}`}
+                    className="w-full h-auto"
+                  />
+                </div>
               ))}
             </div>
           )}
+          
+          <div className="mt-8 pt-4 border-t flex justify-between">
+            <div className="flex gap-4">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Heart className="h-4 w-4" />
+                <span>Like</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <span>Comment</span>
+              </Button>
+            </div>
+            <Button variant="ghost" size="sm">Share</Button>
+          </div>
         </div>
       </main>
     </div>

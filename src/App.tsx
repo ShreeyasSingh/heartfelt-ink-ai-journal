@@ -16,6 +16,7 @@ import JournalEntry from "./pages/JournalEntry";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import PublishedEntry from "./pages/PublishedEntry";
+import Social from "./pages/Social";
 import { Spinner } from "./components/ui/spinner";
 import Auth from "./pages/Auth";
 
@@ -40,6 +41,14 @@ const App = () => (
               element={
                 <SignedIn>
                   <Dashboard />
+                </SignedIn>
+              }
+            />
+            <Route
+              path="/social"
+              element={
+                <SignedIn>
+                  <Social />
                 </SignedIn>
               }
             />

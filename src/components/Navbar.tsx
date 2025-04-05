@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { UserButton, useUser, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { Book, Home, Plus, Settings } from "lucide-react";
+import { Book, Home, Plus, Settings, Users } from "lucide-react";
 
 export function Navbar() {
   const { user } = useUser();
@@ -29,6 +29,12 @@ export function Navbar() {
               <Button variant="ghost" size="sm">
                 <Home className="mr-2 h-4 w-4" />
                 Dashboard
+              </Button>
+            </Link>
+            <Link to="/social">
+              <Button variant="ghost" size="sm">
+                <Users className="mr-2 h-4 w-4" />
+                Social
               </Button>
             </Link>
             <Link to="/journal/new">

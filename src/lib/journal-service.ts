@@ -3,6 +3,7 @@ import { JournalEntry, JournalStyle } from "@/types/journal";
 
 // Mock data storage (replace with actual database in production)
 let journalEntries: JournalEntry[] = [];
+let userConnections: { userId: string, followingId: string }[] = [];
 
 const defaultStyle: JournalStyle = {
   fontFamily: 'serif',
@@ -126,4 +127,102 @@ export const unpublishJournalEntry = (id: string, userId: string): Promise<Journ
       resolve(journalEntries[index]);
     }, 300);
   });
+};
+
+// New social features
+
+// Follow a user
+export const followUser = (userId: string, followingId: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Check if already following
+      const alreadyFollowing = userConnections.some(
+        conn => conn.userId === userId && conn.followingId === followingId
+      );
+      
+      if (alreadyFollowing) {
+        resolve(true);
+        return;
+      }
+      
+      userConnections.push({ userId, followingId });
+      resolve(true);
+    }, 300);
+  });
+};
+
+// Unfollow a user
+export const unfollowUser = (userId: string, followingId: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const initialLength = userConnections.length;
+      userConnections = userConnections.filter(
+        conn => !(conn.userId === userId && conn.followingId === followingId)
+      );
+      resolve(userConnections.length !== initialLength);
+    }, 300);
+  });
+};
+
+// Get all users that a user is following
+export const getFollowing = (userId: string): Promise<string[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const following = userConnections
+        .filter(conn => conn.userId === userId)
+        .map(conn => conn.followingId);
+      resolve(following);
+    }, 300);
+  });
+};
+
+// Get all users that follow a user
+export const getFollowers = (userId: string): Promise<string[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const followers = userConnections
+        .filter(conn => conn.followingId === userId)
+        .map(conn => conn.userId);
+      resolve(followers);
+    }, 300);
+  });
+};
+
+// Get all published entries from users that a user is following
+export const getFeedEntries = (userId: string): Promise<JournalEntry[]> => {
+  return new Promise(async (resolve) => {
+    setTimeout(async () => {
+      const following = await getFollowing(userId);
+      
+      // Get published entries from followed users
+      const feedEntries = journalEntries.filter(
+        entry => following.includes(entry.userId) && entry.isPublished
+      );
+      
+      // Sort by date, newest first
+      feedEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      resolve(feedEntries);
+    }, 500);
+  });
+};
+
+// Get all published entries (discover feed)
+export const getDiscoverEntries = (): Promise<JournalEntry[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const publicEntries = journalEntries.filter(entry => entry.isPublished);
+      
+      // Sort by date, newest first
+      publicEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      resolve(publicEntries);
+    }, 300);
+  });
+};
+
+// Search for users
+export const searchUsers = (query: string): Promise<any[]> => {
+  // This is a mock function. In a real app, you would search users in a database
+  return Promise.resolve([]);
 };
