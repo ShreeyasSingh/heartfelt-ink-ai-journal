@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
@@ -28,7 +27,7 @@ import {
   unpublishJournalEntry,
 } from "@/lib/journal-service";
 import { getAIResponse } from "@/lib/ai-service";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/use-toast";
 
 const JournalEntryPage = () => {
   const navigate = useNavigate();

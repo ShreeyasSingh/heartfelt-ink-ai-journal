@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { Navbar } from "@/components/Navbar";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/use-toast";
 
 const Settings = () => {
   const { user } = useUser();
