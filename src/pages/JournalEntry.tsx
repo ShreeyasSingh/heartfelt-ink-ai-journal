@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import { Navbar } from "@/components/Navbar";
@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft, Image, Save, Send, Share, Sparkles, Palette } from "lucide-react";
+import { ArrowLeft, Image, Save, Send, Share, Sparkles, Palette, X } from "lucide-react";
 import { JournalEntry, JournalStyle, AIResponse } from "@/types/journal";
 import {
   getJournalEntry,
@@ -39,6 +39,7 @@ const JournalEntryPage = () => {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [styleDialogOpen, setStyleDialogOpen] = useState(false);
   const [question, setQuestion] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [aiResponse, setAiResponse] = useState<AIResponse>({
     answer: "",
     isLoading: false,
@@ -182,6 +183,46 @@ const JournalEntryPage = () => {
     });
   };
 
+  const handleImageUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newImages: string[] = [...entry.images];
+    
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          const imageDataUrl = e.target.result as string;
+          setEntry(prev => ({
+            ...prev,
+            images: [...prev.images, imageDataUrl]
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    const updatedImages = [...entry.images];
+    updatedImages.splice(index, 1);
+    setEntry({
+      ...entry,
+      images: updatedImages
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -277,7 +318,15 @@ const JournalEntryPage = () => {
                 
                 <TabsContent value="images">
                   <div className="space-y-4">
-                    <Button variant="outline" className="w-full">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                    />
+                    <Button variant="outline" className="w-full" onClick={handleImageUpload}>
                       <Image className="mr-2 h-4 w-4" />
                       Add Images
                     </Button>
@@ -285,7 +334,19 @@ const JournalEntryPage = () => {
                     {entry.images.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2">
                         {entry.images.map((img, i) => (
-                          <div key={i} className="aspect-square bg-muted rounded-md"></div>
+                          <div key={i} className="relative group aspect-square bg-muted rounded-md overflow-hidden">
+                            <img 
+                              src={img} 
+                              alt={`Journal image ${i + 1}`} 
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              className="absolute top-1 right-1 bg-black/50 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => removeImage(i)}
+                            >
+                              <X className="h-4 w-4 text-white" />
+                            </button>
+                          </div>
                         ))}
                       </div>
                     ) : (
